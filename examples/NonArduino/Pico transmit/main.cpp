@@ -25,15 +25,15 @@
 */
 
 // define pins to be used
-#define SPI_PORT spi0
-#define SPI_MISO 4
-#define SPI_MOSI 3
-#define SPI_SCK 2
+#define SPI_PORT spi1
+#define SPI_MISO 12
+#define SPI_MOSI 11
+#define SPI_SCK 14
 
-#define RFM_NSS 26
-#define RFM_RST 22
-#define RFM_DIO0 14
-#define RFM_DIO1 15
+#define RFM_NSS 13
+#define RFM_RST 9
+#define RFM_DIO0 10
+#define RFM_DIO1 7
 
 #include <pico/stdlib.h>
 
@@ -51,11 +51,11 @@ PicoHal* hal = new PicoHal(SPI_PORT, SPI_MISO, SPI_MOSI, SPI_SCK);
 // DIO0 pin:  14
 // RESET pin:  22
 // DIO1 pin:  15
-SX1276 radio = new Module(hal, RFM_NSS, RFM_DIO0, RFM_RST, RFM_DIO1);
+LLCC68 radio = new Module(hal, RFM_NSS, RFM_DIO0, RFM_RST, RFM_DIO1);
 
 int main() {
   // initialize just like with Arduino
-  printf("[SX1276] Initializing ... ");
+  printf("[LLCC68] Initializing ... ");
   int state = radio.begin();
   if (state != RADIOLIB_ERR_NONE) {
     printf("failed, code %d\n", state);
@@ -63,17 +63,32 @@ int main() {
   }
   printf("success!\n");
 
+  // set output power to 18 dBm (accepted range is -17 - 22 dBm)
+  if (radio.setOutputPower(18) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    printf("Selected output power is invalid for this module!\n");
+    while (true) { hal->delay(10); }
+  }
+  printf("18dBm success!\n");
+
+  // set over current protection limit to 110 mA (accepted range is 45 - 240 mA)
+  // NOTE: set value to 0 to disable overcurrent protection
+  if (radio.setCurrentLimit(110) == RADIOLIB_ERR_INVALID_CURRENT_LIMIT) {
+    printf("Selected current limit is invalid for this module!\n");
+    while (true) { hal->delay(10); }
+  }
+  printf("110mA success!\n");
+
   // loop forever
   for(;;) {
     // send a packet
-    printf("[SX1276] Transmitting packet ... ");
+    printf("[LLCC68] Transmitting packet ... ");
     state = radio.transmit("Hello World!");
     if(state == RADIOLIB_ERR_NONE) {
       // the packet was successfully transmitted
       printf("success!\n");
 
       // wait for a second before transmitting again
-      hal->delay(1000);
+      hal->delay(10000);
 
     } else {
       printf("failed, code %d\n", state);

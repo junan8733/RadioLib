@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.18)
 # Pull in SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(pico-sx1276 C CXX ASM)
+project(pico-llcc68 C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
