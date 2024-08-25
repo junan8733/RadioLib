@@ -27,7 +27,7 @@
 // define pins to be used
 #define SPI_PORT spi1
 #define SPI_MISO 12
-#define SPI_MOSI 11
+#define SPI_MOSI 15
 #define SPI_SCK 14
 
 #define RFM_NSS 13
